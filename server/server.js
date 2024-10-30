@@ -25,13 +25,8 @@ require("dotenv").config();
 
 // Session secret for express session
 const sessionSecret = process.env.SESSION_SECRET;
-const opensearch = process.env.OPENSEARCH_URL;
 if (!sessionSecret) {
 	console.error("Missing SESSION_SECRET environment variable. Exiting...\nHave you run env_generator.js yet?");
-	process.exit(1);
-}
-if (!opensearch) {
-	console.error("Missing OPENSEARCH_URL environment variable. Exiting...\nHave you run env_generator.js yet?");
 	process.exit(1);
 }
 
@@ -59,8 +54,8 @@ app.use(
 	helmet({
 		contentSecurityPolicy: {
 			directives: {
-				defaultSrc: ["'self'", "http://localhost:8080", "http://localhost:3000", opensearch],
-				scriptSrc: ["'self'", "'unsafe-inline'", "http://localhost:3000", opensearch]
+				defaultSrc: ["'self'", "http://localhost:8080", "http://localhost:3000"],
+				scriptSrc: ["'self'", "'unsafe-inline'", "http://localhost:3000"]
 				// imgSrc: ["'self'", "data:"], // If we need image uploading
 			}
 		},
@@ -222,54 +217,6 @@ const partSchema = Joi.object({
 
 const idSchema = Joi.object({
 	id: Joi.number().min(1).default(1),
-});
-
-const opensearchSchemaBasic = Joi.object({
-	method: Joi.string().trim().required().valid("create", "insert", "purge", "delete"),
-	amount: Joi.string().trim().optional().valid("all", "single"),
-	type: Joi.string().trim().optional().valid("index", "template", "data", "document"), 
-	part: Joi.string().trim().optional().valid("chassis", "cpu", "cpu_cooler", "gpu", "memory", "motherboard", "psu", "storage", "part_inventory"),
-	id: Joi.number().optional(),
-});
-
-const opensearchSchema = Joi.object({
-	method: Joi.string().trim().required().valid("create", "insert", "purge", "delete"),
-	amount: Joi.string()
-		.trim()
-		.optional()
-		.valid("all", "single")
-		.when("method", {
-			is: Joi.valid("insert", "delete"),
-			then: Joi.required()
-		}),
-	type: Joi.string()
-		.trim()
-		.optional()
-		.valid("index", "template", "data", "document")
-		.when("method", {
-			is: Joi.valid("create", "delete"),
-			then: Joi.required()
-		}),
-	part: Joi.string()
-		.trim()
-		.optional()
-		.valid("chassis", "cpu", "cpu_cooler", "gpu", "memory", "motherboard", "psu", "storage", "part_inventory")
-		.when("method", {
-			is: Joi.valid("insert", "delete"),
-			then: Joi.when("amount", {
-				is: Joi.valid("single"),
-				then: Joi.required()
-			})
-		}),
-	id: Joi.number()
-		.optional()
-		.when("method", {
-			is: "delete",
-			then: Joi.when("amount", {
-				is: Joi.valid("single"),
-				then: Joi.required()
-			})
-		})
 });
 
 const partNameSchema = Joi.string()
@@ -479,24 +426,15 @@ const searchSanitization = (key, value, term) => {
 			"availableRange",
 			"DateAdded",
 			"additionaldetails"
-		],
-		opensearch: [
-			"method",
-			"amount",
-			"type",
-			"part",
-			"id",
 		]
-
 	};
 
 	const universalPartColumns = ["ID", "Url", "Image", "Image_Url"];
 	const universalColumns = ["Price", "Name", "Manufacturer", "pricemin", "pricemax", "pricerange", "strict", "inverted"];
 	const combinedColumns = key !== "inventory" ? [...universalPartColumns, ...universalColumns] : universalColumns;
-	const tableTypeColumns = key !== "opensearch" ? combinedColumns : [];
 
 	const validColumns = mappedColumnNames[key] || [];
-	const allValidColumns = [...tableTypeColumns, ...validColumns];
+	const allValidColumns = [...combinedColumns, ...validColumns];
 
 	if (!allValidColumns || !allValidColumns.map((col) => col.toLowerCase()).includes(term)) {
 		return { error: `Search for '${term}' is not allowed in part '${key}'!` };
@@ -528,9 +466,6 @@ const tableSearch = (searchContext = "cpu") => {
 			let currentSchema = partSchema;
 			if (partName === "inventory") {
 				currentSchema = inventorySchema;
-			}
-			if (partName === "opensearch") {
-				currentSchema = opensearchSchema;
 			}
 			const validationResult = Joi.attempt(searchTerms, currentSchema);
 			console.log(validationResult);
