@@ -30,8 +30,4 @@ public abstract class UniversalComponents {
     @Column(name = "Image_Url")
     private String imageUrl;
 
-
-
-
-
 }

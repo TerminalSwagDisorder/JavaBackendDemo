@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -85,24 +87,32 @@ public class UniversalComponentsController {
 
     // Insert a new part based on partName
     @PostMapping("/insert/{partName}")
-    public Object insertPart(@PathVariable String partName, @RequestBody Object part) {
+    public Object insertPart(@PathVariable String partName, @RequestBody Map<String, Object> partData) {
         switch (partName.toLowerCase()) {
             case "cpu":
-                return cpuService.insert((CPU) part);
+                CPU cpu = objectMapper.convertValue(partData, CPU.class);
+                return cpuService.insert(cpu);
             case "gpu":
-                return gpuService.insert((GPU) part);
+                GPU gpu = objectMapper.convertValue(partData, GPU.class);
+                return gpuService.insert(gpu);
             case "motherboard":
-                return motherboardService.insert((Motherboard) part);
+                Motherboard motherboard = objectMapper.convertValue(partData, Motherboard.class);
+                return motherboardService.insert(motherboard);
             case "memory":
-                return memoryService.insert((Memory) part);
+                Memory memory = objectMapper.convertValue(partData, Memory.class);
+                return memoryService.insert(memory);
             case "psu":
-                return psuService.insert((PSU) part);
+                PSU psu = objectMapper.convertValue(partData, PSU.class);
+                return psuService.insert(psu);
             case "storage":
-                return storageService.insert((Storage) part);
+                Storage storage = objectMapper.convertValue(partData, Storage.class);
+                return storageService.insert(storage);
             case "chassis":
-                return chassisService.insert((Chassis) part);
-            case "cooler":
-                return coolerService.insert((CpuCooler) part);
+                Chassis chassis = objectMapper.convertValue(partData, Chassis.class);
+                return chassisService.insert(chassis);
+            case "cpucooler":
+                CpuCooler cpucooler = objectMapper.convertValue(partData, CpuCooler.class);
+                return coolerService.insert(cpucooler);
             default:
                 throw new IllegalArgumentException("Invalid part name: " + partName);
         }
