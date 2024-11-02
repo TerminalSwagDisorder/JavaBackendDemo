@@ -1,6 +1,7 @@
 package com.server.JavaServer.service;
 
 import com.server.JavaServer.model.Storage;
+import com.server.JavaServer.mapper.StorageMapper;
 import com.server.JavaServer.repository.StorageRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,9 @@ public class StorageService {
 
     @Autowired
     private StorageRepository storageRepository;
+
+    @Autowired
+    private StorageMapper storageMapper;
 
     public Page<Storage> findAll(PageRequest pageRequest) {
         return storageRepository.findAll(pageRequest);
@@ -40,15 +44,16 @@ public class StorageService {
     }
 
     public Storage update(Long id, Storage storage) {
-        Optional<Storage> existingCpu = storageRepository.findById(id);
-        if (existingCpu.isPresent()) {
-            Storage updatedCpu = existingCpu.get();
-            BeanUtils.copyProperties(storage, updatedCpu, "id");
-            return storageRepository.save(updatedCpu);
+        Optional<Storage> existingStorage = storageRepository.findById(id);
+        if (existingStorage.isPresent()) {
+            Storage updatedStorage = existingStorage.get();
+            storageMapper.updateStorageFromDto(storage, updatedStorage);
+            return storageRepository.save(updatedStorage);
         } else {
             throw new EntityNotFoundException("Storage with id " + id + " not found");
         }
     }
+
     public Storage saveOrUpdate(Storage storage) {
         return storageRepository.save(storage);
     }

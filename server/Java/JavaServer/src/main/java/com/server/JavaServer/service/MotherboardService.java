@@ -1,6 +1,7 @@
 package com.server.JavaServer.service;
 
 import com.server.JavaServer.model.Motherboard;
+import com.server.JavaServer.mapper.MotherboardMapper;
 import com.server.JavaServer.repository.MotherboardRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,9 @@ public class MotherboardService {
 
     @Autowired
     private MotherboardRepository motherboardRepository;
+
+    @Autowired
+    private MotherboardMapper motherboardMapper;
 
     public Page<Motherboard> findAll(PageRequest pageRequest) {
         return motherboardRepository.findAll(pageRequest);
@@ -40,11 +44,11 @@ public class MotherboardService {
     }
 
     public Motherboard update(Long id, Motherboard motherboard) {
-        Optional<Motherboard> existingCpu = motherboardRepository.findById(id);
-        if (existingCpu.isPresent()) {
-            Motherboard updatedCpu = existingCpu.get();
-            BeanUtils.copyProperties(motherboard, updatedCpu, "id");
-            return motherboardRepository.save(updatedCpu);
+        Optional<Motherboard> existingMotherboard = motherboardRepository.findById(id);
+        if (existingMotherboard.isPresent()) {
+            Motherboard updatedMotherboard = existingMotherboard.get();
+            motherboardMapper.updateMotherboardFromDto(motherboard, updatedMotherboard);
+            return motherboardRepository.save(updatedMotherboard);
         } else {
             throw new EntityNotFoundException("Motherboard with id " + id + " not found");
         }

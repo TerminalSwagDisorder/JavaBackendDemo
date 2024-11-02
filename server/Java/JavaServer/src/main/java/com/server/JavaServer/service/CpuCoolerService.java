@@ -1,6 +1,7 @@
 package com.server.JavaServer.service;
 
 import com.server.JavaServer.model.CpuCooler;
+import com.server.JavaServer.mapper.CpuCoolerMapper;
 import com.server.JavaServer.repository.CpuCoolerRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,9 @@ public class CpuCoolerService {
 
     @Autowired
     private CpuCoolerRepository cpucoolerRepository;
+    
+    @Autowired
+    private CpuCoolerMapper cpucoolerMapper;
 
     public Page<CpuCooler> findAll(PageRequest pageRequest) {
         return cpucoolerRepository.findAll(pageRequest);
@@ -40,11 +44,11 @@ public class CpuCoolerService {
     }
 
     public CpuCooler update(Long id, CpuCooler cpucooler) {
-        Optional<CpuCooler> existingCpu = cpucoolerRepository.findById(id);
-        if (existingCpu.isPresent()) {
-            CpuCooler updatedCpu = existingCpu.get();
-            BeanUtils.copyProperties(cpucooler, updatedCpu, "id");
-            return cpucoolerRepository.save(updatedCpu);
+        Optional<CpuCooler> existingCpuCooler = cpucoolerRepository.findById(id);
+        if (existingCpuCooler.isPresent()) {
+            CpuCooler updatedCpuCooler = existingCpuCooler.get();
+            cpucoolerMapper.updateCpuCoolerFromDto(cpucooler, updatedCpuCooler);
+            return cpucoolerRepository.save(updatedCpuCooler);
         } else {
             throw new EntityNotFoundException("CpuCooler with id " + id + " not found");
         }

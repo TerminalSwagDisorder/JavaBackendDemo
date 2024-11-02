@@ -42,18 +42,17 @@ public class CPUService {
         }
         return cpuRepository.save(cpu);
     }
-    
+
     public CPU update(Long id, CPU cpu) {
         Optional<CPU> existingCpu = cpuRepository.findById(id);
         if (existingCpu.isPresent()) {
             CPU updatedCpu = existingCpu.get();
-            BeanUtils.copyProperties(cpu, updatedCpu, "id");
+            cpuMapper.updateCPUFromDto(cpu, updatedCpu);
             return cpuRepository.save(updatedCpu);
         } else {
             throw new EntityNotFoundException("CPU with id " + id + " not found");
         }
     }
-
 
     public CPU saveOrUpdate(CPU cpu) {
         return cpuRepository.save(cpu);

@@ -1,6 +1,7 @@
 package com.server.JavaServer.service;
 
 import com.server.JavaServer.model.GPU;
+import com.server.JavaServer.mapper.GPUMapper;
 import com.server.JavaServer.repository.GPURepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,9 @@ public class GPUService {
 
     @Autowired
     private GPURepository gpuRepository;
+
+    @Autowired
+    private GPUMapper gpuMapper;
 
     public Page<GPU> findAll(PageRequest pageRequest) {
         return gpuRepository.findAll(pageRequest);
@@ -40,11 +44,11 @@ public class GPUService {
     }
 
     public GPU update(Long id, GPU gpu) {
-        Optional<GPU> existingCpu = gpuRepository.findById(id);
-        if (existingCpu.isPresent()) {
-            GPU updatedCpu = existingCpu.get();
-            BeanUtils.copyProperties(gpu, updatedCpu, "id");
-            return gpuRepository.save(updatedCpu);
+        Optional<GPU> existingGpu = gpuRepository.findById(id);
+        if (existingGpu.isPresent()) {
+            GPU updatedGpu = existingGpu.get();
+            gpuMapper.updateGPUFromDto(gpu, updatedGpu);
+            return gpuRepository.save(updatedGpu);
         } else {
             throw new EntityNotFoundException("GPU with id " + id + " not found");
         }

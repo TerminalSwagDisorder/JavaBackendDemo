@@ -1,6 +1,7 @@
 package com.server.JavaServer.service;
 
 import com.server.JavaServer.model.Chassis;
+import com.server.JavaServer.mapper.ChassisMapper;
 import com.server.JavaServer.repository.ChassisRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,9 @@ public class ChassisService {
 
     @Autowired
     private ChassisRepository chassisRepository;
+
+    @Autowired
+    private ChassisMapper chassisMapper;
 
     public Page<Chassis> findAll(PageRequest pageRequest) {
         return chassisRepository.findAll(pageRequest);
@@ -40,11 +44,11 @@ public class ChassisService {
     }
 
     public Chassis update(Long id, Chassis chassis) {
-        Optional<Chassis> existingCpu = chassisRepository.findById(id);
-        if (existingCpu.isPresent()) {
-            Chassis updatedCpu = existingCpu.get();
-            BeanUtils.copyProperties(chassis, updatedCpu, "id");
-            return chassisRepository.save(updatedCpu);
+        Optional<Chassis> existingChassis = chassisRepository.findById(id);
+        if (existingChassis.isPresent()) {
+            Chassis updatedChassis = existingChassis.get();
+            BeanUtils.copyProperties(chassis, updatedChassis, "id");
+            return chassisRepository.save(updatedChassis);
         } else {
             throw new EntityNotFoundException("Chassis with id " + id + " not found");
         }

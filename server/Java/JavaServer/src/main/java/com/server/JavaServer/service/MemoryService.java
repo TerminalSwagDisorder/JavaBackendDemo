@@ -1,6 +1,7 @@
 package com.server.JavaServer.service;
 
 import com.server.JavaServer.model.Memory;
+import com.server.JavaServer.mapper.MemoryMapper;
 import com.server.JavaServer.repository.MemoryRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,9 @@ public class MemoryService {
 
     @Autowired
     private MemoryRepository memoryRepository;
+
+    @Autowired
+    private MemoryMapper memoryMapper;
 
     public Page<Memory> findAll(PageRequest pageRequest) {
         return memoryRepository.findAll(pageRequest);
@@ -40,11 +44,11 @@ public class MemoryService {
     }
 
     public Memory update(Long id, Memory memory) {
-        Optional<Memory> existingCpu = memoryRepository.findById(id);
-        if (existingCpu.isPresent()) {
-            Memory updatedCpu = existingCpu.get();
-            BeanUtils.copyProperties(memory, updatedCpu, "id");
-            return memoryRepository.save(updatedCpu);
+        Optional<Memory> existingMemory = memoryRepository.findById(id);
+        if (existingMemory.isPresent()) {
+            Memory updatedMemory = existingMemory.get();
+            memoryMapper.updateMemoryFromDto(memory, updatedMemory);
+            return memoryRepository.save(updatedMemory);
         } else {
             throw new EntityNotFoundException("Memory with id " + id + " not found");
         }

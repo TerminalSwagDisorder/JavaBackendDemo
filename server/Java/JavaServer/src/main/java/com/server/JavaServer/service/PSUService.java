@@ -1,6 +1,7 @@
 package com.server.JavaServer.service;
 
 import com.server.JavaServer.model.PSU;
+import com.server.JavaServer.mapper.PSUMapper;
 import com.server.JavaServer.repository.PSURepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,9 @@ public class PSUService {
 
     @Autowired
     private PSURepository psuRepository;
+
+    @Autowired
+    private PSUMapper psuMapper;
 
     public Page<PSU> findAll(PageRequest pageRequest) {
         return psuRepository.findAll(pageRequest);
@@ -40,11 +44,11 @@ public class PSUService {
     }
 
     public PSU update(Long id, PSU psu) {
-        Optional<PSU> existingCpu = psuRepository.findById(id);
-        if (existingCpu.isPresent()) {
-            PSU updatedCpu = existingCpu.get();
-            BeanUtils.copyProperties(psu, updatedCpu, "id");
-            return psuRepository.save(updatedCpu);
+        Optional<PSU> existingPsu = psuRepository.findById(id);
+        if (existingPsu.isPresent()) {
+            PSU updatedPsu = existingPsu.get();
+            psuMapper.updatePSUFromDto(psu, updatedPsu);
+            return psuRepository.save(updatedPsu);
         } else {
             throw new EntityNotFoundException("PSU with id " + id + " not found");
         }
