@@ -2,13 +2,14 @@ package com.server.JavaServer.controller;
 
 import com.server.JavaServer.model.*;
 import com.server.JavaServer.service.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/part")
@@ -22,17 +23,44 @@ public class UniversalComponentsController {
     @Autowired private StorageService storageService;
     @Autowired private ChassisService chassisService;
     @Autowired private CpuCoolerService coolerService;
+    
+    @Autowired private ObjectMapper objectMapper;
 
     // Get all parts or a part by ID based on partName query
     @GetMapping
-    public List<?> getAllPartsOrById(
+    public List<?> getPartsQueried(
         @RequestParam String partName,
         @RequestParam(required = false) Long id,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "50") int items
     ) {
+        return getPartsContent(partName, id, page, items);
+    }
+    
+    @GetMapping("/view/{partName}")
+    public List<?> getPartsPathed(
+        @PathVariable String partName,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "50") int items
+    ) {
+        return getPartsContent(partName, null, page, items);
+    }
+
+    // Different version
+    @GetMapping("/view/{partName}/{id}")
+    public List<?> getPartsPathedWithId(
+        @PathVariable String partName,
+        @PathVariable Long id,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "50") int items
+    ) {
+        return getPartsContent(partName, id, page, items);
+    }
+
+    // Common logic for handling both methods
+    private List<?> getPartsContent(String partName, Long id, int page, int items) {
         PageRequest pageRequest = PageRequest.of(page, items);
-        
+
         switch (partName.toLowerCase()) {
             case "cpu":
                 return id != null ? cpuService.findByIdAsPage(id, pageRequest).getContent() : cpuService.findAll(pageRequest).getContent();
@@ -55,34 +83,69 @@ public class UniversalComponentsController {
         }
     }
 
-    // Create or update a part based on partName
-    @PostMapping
-    public Object createOrUpdatePart(@RequestParam String partName, @RequestBody Object part) {
+    // Insert a new part based on partName
+    @PostMapping("/insert/{partName}")
+    public Object insertPart(@PathVariable String partName, @RequestBody Object part) {
         switch (partName.toLowerCase()) {
             case "cpu":
-                return cpuService.saveOrUpdate((CPU) part);
+                return cpuService.insert((CPU) part);
             case "gpu":
-                return gpuService.saveOrUpdate((GPU) part);
+                return gpuService.insert((GPU) part);
             case "motherboard":
-                return motherboardService.saveOrUpdate((Motherboard) part);
+                return motherboardService.insert((Motherboard) part);
             case "memory":
-                return memoryService.saveOrUpdate((Memory) part);
+                return memoryService.insert((Memory) part);
             case "psu":
-                return psuService.saveOrUpdate((PSU) part);
+                return psuService.insert((PSU) part);
             case "storage":
-                return storageService.saveOrUpdate((Storage) part);
+                return storageService.insert((Storage) part);
             case "chassis":
-                return chassisService.saveOrUpdate((Chassis) part);
+                return chassisService.insert((Chassis) part);
             case "cooler":
-                return coolerService.saveOrUpdate((CpuCooler) part);
+                return coolerService.insert((CpuCooler) part);
             default:
                 throw new IllegalArgumentException("Invalid part name: " + partName);
         }
     }
 
+
+    // Update an existing part based on partName
+    @PatchMapping("/update/{partName}/{id}")
+    public Object updatePart(@PathVariable String partName, @PathVariable Long id, @RequestBody Map<String, Object> partData) {
+        switch (partName.toLowerCase()) {
+            case "cpu":
+                CPU cpu = objectMapper.convertValue(partData, CPU.class);
+                return cpuService.update(id, cpu);
+            case "gpu":
+                GPU gpu = objectMapper.convertValue(partData, GPU.class);
+                return gpuService.update(id, gpu);
+            case "motherboard":
+                Motherboard motherboard = objectMapper.convertValue(partData, Motherboard.class);
+                return motherboardService.update(id, motherboard);
+            case "memory":
+                Memory memory = objectMapper.convertValue(partData, Memory.class);
+                return memoryService.update(id, memory);
+            case "psu":
+                PSU psu = objectMapper.convertValue(partData, PSU.class);
+                return psuService.update(id, psu);
+            case "storage":
+                Storage storage = objectMapper.convertValue(partData, Storage.class);
+                return storageService.update(id, storage);
+            case "chassis":
+                Chassis chassis = objectMapper.convertValue(partData, Chassis.class);
+                return chassisService.update(id, chassis);
+            case "cpucooler":
+                CpuCooler cpucooler = objectMapper.convertValue(partData, CpuCooler.class);
+                return coolerService.update(id, cpucooler);
+            default:
+                throw new IllegalArgumentException("Invalid part name: " + partName);
+        }
+    }
+
+
     // Delete a part by ID based on partName
-    @DeleteMapping
-    public void deletePart(@RequestParam String partName, @RequestParam Long id) {
+    @DeleteMapping("/delete/{partName}/{id}")
+    public void deletePart(@PathVariable String partName, @PathVariable Long id) {
         switch (partName.toLowerCase()) {
             case "cpu":
                 cpuService.delete(id);

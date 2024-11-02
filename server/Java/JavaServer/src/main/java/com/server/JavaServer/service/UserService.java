@@ -21,14 +21,11 @@ public class UserService {
 
  @Transactional
  public User registerUser(@Valid User user) throws Exception {
-     // Check if email exists
      if(userRepository.findByEmail(user.getEmail()).isPresent()){
          throw new Exception("Email already in use");
      }
-     // Encode password
      user.setPassword(passwordEncoder.encode(user.getPassword()));
-     // Set default roleID
-     user.setRoleID(1); // Adjust as needed
+     user.setRoleID(1); // Guest = 1
      return userRepository.save(user);
  }
 

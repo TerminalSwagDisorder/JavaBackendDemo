@@ -12,8 +12,6 @@ import UsersAdmin from "./components/UsersAdmin";
 import PartsDisplay from "./components/PartsDisplay";
 import ComputerWizard from './components/ComputerWizard';
 import ComputerWizardBrowse from './components/ComputerWizardBrowse';
-import UsedParts from './components/UsedParts';
-import UsedPartsBrowse from './components/UsedPartsBrowse';
 import ShoppingCart from './components/ShoppingCart';
 import { ThemeContext, ThemeProvider, fetchUsers, fetchDynamicData, fetchSearchIdData, fetchDataAmount, handleSignin, handleSignup, handleSignout, checkIfSignedIn, refreshProfile, handleCredentialChange } from "./api/api";
 import { useSelector, useDispatch } from "react-redux";
@@ -91,8 +89,6 @@ function App() {
 			</>
 		)}
 			<Route path="newparts" element={<ComputerWizardBrowse fetchDynamicData={fetchDynamicData} fetchDataAmount={fetchDataAmount} />} />
-
-			<Route path="usedparts" element={<UsedPartsBrowse fetchDynamicData={fetchDynamicData} fetchDataAmount={fetchDataAmount} />} />
 			
 			{shoppingCart && totalCartItems && totalCartItems > 0 && (
 				<Route path="shoppingcart" element={<ShoppingCart />} />

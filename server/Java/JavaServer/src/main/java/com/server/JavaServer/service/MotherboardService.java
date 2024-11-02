@@ -2,11 +2,13 @@ package com.server.JavaServer.service;
 
 import com.server.JavaServer.model.Motherboard;
 import com.server.JavaServer.repository.MotherboardRepository;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import jakarta.persistence.EntityNotFoundException;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -27,6 +29,24 @@ public class MotherboardService {
             return new PageImpl<>(Collections.singletonList(motherboardOptional.get()), pageRequest, 1);
         } else {
             return Page.empty(pageRequest);
+        }
+    }
+
+    public Motherboard insert(Motherboard motherboard) {
+        if (motherboard.getId() != null) {
+            throw new IllegalArgumentException("ID must be null for insert operation");
+        }
+        return motherboardRepository.save(motherboard);
+    }
+
+    public Motherboard update(Long id, Motherboard motherboard) {
+        Optional<Motherboard> existingCpu = motherboardRepository.findById(id);
+        if (existingCpu.isPresent()) {
+            Motherboard updatedCpu = existingCpu.get();
+            BeanUtils.copyProperties(motherboard, updatedCpu, "id");
+            return motherboardRepository.save(updatedCpu);
+        } else {
+            throw new EntityNotFoundException("Motherboard with id " + id + " not found");
         }
     }
 

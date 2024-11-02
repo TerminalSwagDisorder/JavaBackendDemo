@@ -135,13 +135,6 @@ const NavBar = ({ currentUser, handleUserChange, handleSignout, ThemeContext }) 
 							onClick={() => onUpdateActiveLink("/newparts")}>
 							Browse parts
 						</Nav.Link>
-						<Nav.Link
-							as={Link}
-							to="/usedparts"
-							className={activeLink === "/usedparts" ? "active-navbar-link" : "navbar-link"}
-							onClick={() => onUpdateActiveLink("/usedparts")}>
-							Used parts
-						</Nav.Link>
 					</Nav>
 					<Nav className="ml-auto">{userNavbar()}</Nav>
 					<Nav className="ml-auto">{shoppingCartNavbar()}</Nav>

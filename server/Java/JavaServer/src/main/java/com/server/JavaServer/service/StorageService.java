@@ -2,11 +2,13 @@ package com.server.JavaServer.service;
 
 import com.server.JavaServer.model.Storage;
 import com.server.JavaServer.repository.StorageRepository;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import jakarta.persistence.EntityNotFoundException;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -29,7 +31,24 @@ public class StorageService {
             return Page.empty(pageRequest);
         }
     }
+    
+    public Storage insert(Storage storage) {
+        if (storage.getId() != null) {
+            throw new IllegalArgumentException("ID must be null for insert operation");
+        }
+        return storageRepository.save(storage);
+    }
 
+    public Storage update(Long id, Storage storage) {
+        Optional<Storage> existingCpu = storageRepository.findById(id);
+        if (existingCpu.isPresent()) {
+            Storage updatedCpu = existingCpu.get();
+            BeanUtils.copyProperties(storage, updatedCpu, "id");
+            return storageRepository.save(updatedCpu);
+        } else {
+            throw new EntityNotFoundException("Storage with id " + id + " not found");
+        }
+    }
     public Storage saveOrUpdate(Storage storage) {
         return storageRepository.save(storage);
     }

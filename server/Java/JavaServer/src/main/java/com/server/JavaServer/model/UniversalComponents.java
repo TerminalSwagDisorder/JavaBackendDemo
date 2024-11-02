@@ -10,7 +10,7 @@ public abstract class UniversalComponents {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
-    private Integer id;
+    private Long id;
     
     @Column(name = "Url")
     private String url;
