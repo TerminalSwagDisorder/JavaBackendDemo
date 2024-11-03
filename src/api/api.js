@@ -36,6 +36,7 @@ export const ThemeProvider = ({ children }) => {
 // Fetch users using pagination
 export const fetchUsers = async (page) => {
 	try {
+		page = parseInt(page) - 1
 		const response = await fetch(`http://localhost:4000/api/users?page=${page}&items=50`, {
 			method: "GET",
 			credentials: "include", // Important, because we're using cookies
@@ -64,8 +65,9 @@ export const fetchUsers = async (page) => {
 // Fetch different types of data from pages
 export const fetchDynamicData = async (page, tableName, partName) => {
 	try {
-		// Why array with getroutes here?
-		await checkAllowedTableNames(["getroutes"], tableName);
+		page = parseInt(page) - 1
+
+		await checkAllowedTableNames(tableName);
 		
 		if (partName) {
 			await checkAllowedPartNames(partName);
@@ -99,11 +101,82 @@ export const fetchDynamicData = async (page, tableName, partName) => {
 	}
 };
 
+export const insertDynamicData = async (formFields, tableName, partName) => {
+	try {
+		await checkAllowedTableNames(tableName);
+		
+		if (partName) {
+			await checkAllowedPartNames(partName);
+		} else {
+			console.log("partName has no value. This might be intentional, but double check to be sure.");
+		}
+
+		if (formFields && typeof formFields === "object" && !Array.isArray(formFields)) formFields = JSON.stringify(formFields);
+		// api call to register a new user
+		const response = await fetch(`http://localhost:4000/api/${tableName}/insert/${partName}`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			credentials: "include", // Important, because we're using cookies
+			body: JSON.stringify({ formFields: formFields }),
+		});
+
+		const data = await response.json();
+
+        if (!response.ok) {
+            alert(`HTTP error ${response.status}: ${data.message}`);
+            throw new Error(`HTTP error ${response.status}: ${data.message}`);
+        }
+
+		return data;
+	} catch (error) {
+		console.error("Error adding user:", error);
+		if (error.message) alert(error.message);
+
+	}
+};
+
+export const updateDynamicData = async (formFields, tableName, partName, id) => {
+	try {
+		await checkAllowedTableNames(tableName);
+		
+		if (partName) {
+			await checkAllowedPartNames(partName);
+		} else {
+			console.log("partName has no value. This might be intentional, but double check to be sure.");
+		}
+
+		if (formFields && typeof formFields === "object" && !Array.isArray(formFields)) formFields = JSON.stringify(formFields);
+		// api call to register a new user
+		const response = await fetch(`http://localhost:4000/api/${tableName}/update/${partName}/${partName}`, {
+			method: "PATCH",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			credentials: "include", // Important, because we're using cookies
+			body: JSON.stringify({ formFields: formFields }),
+		});
+
+		const data = await response.json();
+
+        if (!response.ok) {
+            alert(`HTTP error ${response.status}: ${data.message}`);
+            throw new Error(`HTTP error ${response.status}: ${data.message}`);
+        }
+
+		return data;
+	} catch (error) {
+		console.error("Error adding user:", error);
+		if (error.message) alert(error.message);
+
+	}
+};
 
 // Search function for users/otherusers
 export const fetchSearchData = async (searchTerms, tableName) => {
 	try {
-		await checkAllowedTableNames(["getroutes"], tableName);
+		await checkAllowedTableNames(tableName);
 		const correctSearchTerms = await checkSearchTerms(searchTerms);
 		
 		const query = await buildQuery(correctSearchTerms, false);
@@ -134,7 +207,7 @@ export const fetchSearchData = async (searchTerms, tableName) => {
 export const fetchSearchIdData = async (id, tableName, partName) => {
 	console.log(id, tableName);
 	try {
-		await checkAllowedTableNames(["getroutes"], tableName);
+		await checkAllowedTableNames(tableName);
 		await checkAllowedPartNames(partName);
 		
 		const correctSearchTerms = await checkSearchTerms([partName, id]);
@@ -255,7 +328,7 @@ export const handleSignin = async (event, formFields, handleUserChange) => {
 
 // Signup
 export const handleSignup = async (event, formFields) => {
-	//console.log(name, email, password)
+	console.log(formFields);
 	try {
 		if (formFields && typeof formFields === "object" && !Array.isArray(formFields)) formFields = JSON.stringify(formFields);
 		// api call to register a new user
@@ -270,18 +343,14 @@ export const handleSignup = async (event, formFields) => {
 
 		const data = await response.json();
 
-		if (response.ok) {
-			alert("Signed up successfully");
-			return true;
-		} else {
-			if (data.message) {
-				alert(`HTTP error ${response.status}: ${data.message}`);
-				throw new Error(data.error);
-			} else {
-				alert("Failed sign up. Please try again.");
-				throw new Error(data.error);
-			}
-		}
+        if (!response.ok) {
+            alert(`HTTP error ${response.status}: ${data.message}`);
+            throw new Error(`HTTP error ${response.status}: ${data.message}`);
+        }
+
+		alert("Signed up successfully");
+
+		return true;
 	} catch (error) {
 		console.error("Error adding user:", error);
 		if (error.message) alert(error.message);

@@ -2,29 +2,11 @@
 // Auth: Terminal Swag Disorder
 // Desc: File containing code for api helpers
 
-import { fetchServerRoutes } from "./api";
 import React, { useEffect, useState, createContext, useContext } from "react";
 import "../style/style.scss";
 
-export const checkAllowedTableNames = async (routeTypeArr, tableName) => {
-    if (!Array.isArray(routeTypeArr)) {
-        // console.error("Function parameter 1 must be an array!");
-        throw new Error("Function parameter 1 must be an array!");
-    }
-
-    const allowedTableNamesArray = [];
-    const allRoutes = await fetchServerRoutes();
-    
-    const transformRouteTypes = routeTypeArr.map((col) => col.toLowerCase());
-
-    for (let route in allRoutes) {
-        if (transformRouteTypes.includes(route.toLowerCase())) {
-            for (let r of allRoutes[route]) {
-                const path = r.path.toLowerCase().includes("/api/") ? r.path.split("/api/")[1] : r.path;
-                allowedTableNamesArray.push(path);
-            }
-        }
-    }
+export const checkAllowedTableNames = async (tableName) => {
+    const allowedTableNamesArray = ["count", "part", "users"];
 
     if (!allowedTableNamesArray.includes(tableName) || tableName === "") {
         // console.error(`tableName "${tableName}" is not allowed!`);

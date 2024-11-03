@@ -47,5 +47,4 @@ public class UserService {
 	    return userRepository.findAll();
 	}
 
- // Additional methods for updating user, etc.
 }

@@ -8,8 +8,8 @@ import { Container, Button, Form, Spinner } from "react-bootstrap";
 // Function for signin in, take onSubmit and setting the current user as props
 export const Signin = ({ handleUserChange, currentUser, handleSignin, checkIfSignedIn }) => {
 	const navigate = useNavigate();
-	const [email, setEmail] = useState("");
-	const [password, setPassword] = useState("");
+	const [Email, setEmail] = useState("");
+	const [Password, setPassword] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
 	const [userType, setUserType] = useState("user");
 	const [formFields, setFormFields] = useState({});
@@ -93,10 +93,10 @@ export const Signin = ({ handleUserChange, currentUser, handleSignin, checkIfSig
 					<Form.Group className="mb-3" controlId="formBasicEmail" >
 						<Form.Label>Email address</Form.Label>
 						<Form.Control
-							type="email"
-							placeholder="Enter email"
+							type="Email"
+							placeholder="Enter Email"
 							required
-							name="email"
+							name="Email"
 							onChange={handleInputChange}
 						/>
 					</Form.Group>
@@ -104,10 +104,10 @@ export const Signin = ({ handleUserChange, currentUser, handleSignin, checkIfSig
 					<Form.Group className="mb-3" controlId="formBasicPassword">
 						<Form.Label>Password</Form.Label>
 						<Form.Control
-							type="password"
-							placeholder="Enter password"
+							type="Password"
+							placeholder="Enter Password"
 							required
-							name="password"
+							name="Password"
 							onChange={handleInputChange}
 						/>
 					</Form.Group>

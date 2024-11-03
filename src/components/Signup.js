@@ -1,4 +1,4 @@
-// File name: Signup.js
+// File Name: Signup.js
 // Auth: Terminal Swag Disorder
 // Desc: File containing code for signing up page
 import React, { useState, useEffect } from "react";
@@ -12,16 +12,16 @@ export const Signup = ({ handleSignup }) => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [formFields, setFormFields] = useState(
 		{
-		name: "",
-		email: "",
-		password: "",
+		Name: "",
+		Email: "",
+		Password: "",
 		});
 	const [inputValue, setInputValue] = useState("");
-	const [emailValid, setEmailValid] = useState(false);
-	const [passwordValid, setPasswordValid] = useState(false);
+	const [EmailValid, setEmailValid] = useState(false);
+	const [PasswordValid, setPasswordValid] = useState(false);
 
-	const passwordRegex = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{9,}$/;
-	const emailRegex = /^[-A-Za-z0-9!#$%&'*+/=?^_`{|}~]+(?:\.[-A-Za-z0-9!#$%&'*+/=?^_`{|}~]+)*@(?:[A-Za-z0-9](?:[-A-Za-z0-9]*[A-Za-z0-9])?\.)+[A-Za-z0-9](?:[-A-Za-z0-9]*[A-Za-z0-9])?$/;
+	const PasswordRegex = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{9,}$/;
+	const EmailRegex = /^[-A-Za-z0-9!#$%&'*+/=?^_`{|}~]+(?:\.[-A-Za-z0-9!#$%&'*+/=?^_`{|}~]+)*@(?:[A-Za-z0-9](?:[-A-Za-z0-9]*[A-Za-z0-9])?\.)+[A-Za-z0-9](?:[-A-Za-z0-9]*[A-Za-z0-9])?$/;
 
 	const handleInputChange = (event) => {
 		setInputValue(event.target.value);
@@ -30,20 +30,20 @@ export const Signup = ({ handleSignup }) => {
 			[event.target.name]: event.target.value,
 		}));
 
-		if (event.target.name === "email") {
-			setEmailValid(emailRegex.test(event.target.value));
+		if (event.target.name === "Email") {
+			setEmailValid(EmailRegex.test(event.target.value));
 		}
 
-		if (event.target.name === "password") {
-			setPasswordValid(passwordRegex.test(event.target.value));
+		if (event.target.name === "Password") {
+			setPasswordValid(PasswordRegex.test(event.target.value));
 		}
 	};
 		  
   // Function for when the user submits the sign up form
 	const handleSubmit = async (event) => {
 		const newName = event.target.name.value;
-		const newEmail = event.target.email.value;
-		const newPassword = event.target.password.value;
+		const newEmail = event.target.Email.value;
+		const newPassword = event.target.Password.value;
 		if (!newName && !newEmail && !newPassword) {
 			alert("All required fields must be filled!");
 			return;
@@ -100,10 +100,10 @@ export const Signup = ({ handleSignup }) => {
 								<Form.Label>Name</Form.Label>
 								<Form.Control
 									type="text"
-									placeholder="Enter name"
+									placeholder="Enter Name"
 									required
-									name="name"
-									value={formFields.name}
+									Name="Name"
+									value={formFields.Name}
 									onChange={handleInputChange}
 								/>
 							</Form.Group>
@@ -111,13 +111,13 @@ export const Signup = ({ handleSignup }) => {
 							<Form.Group className="mb-3" controlId="formBasicEmail">
 								<Form.Label>Email address</Form.Label>
 								<Form.Control
-									type="email"
-									placeholder="Enter email"
+									type="Email"
+									placeholder="Enter Email"
 									required
-									name="email"
-									value={formFields.email}
+									Name="Email"
+									value={formFields.Email}
 									onChange={handleInputChange}
-									className={emailValid ? "valid-input" : "invalid-input"}
+									className={EmailValid ? "valid-input" : "invalid-input"}
 								/>
 							</Form.Group>
 
@@ -125,13 +125,13 @@ export const Signup = ({ handleSignup }) => {
 								<Form.Label>Password</Form.Label>
 								<OverlayTrigger placement="right" delay={{ hide: 400 }} overlay={renderTooltip}>
 									<Form.Control
-										type="password"
-										placeholder="Enter password"
+										type="Password"
+										placeholder="Enter Password"
 										required
-										name="password"
-										value={formFields.password}
+										Name="Password"
+										value={formFields.Password}
 										onChange={handleInputChange}
-										className={passwordValid ? "valid-input" : "invalid-input"}
+										className={PasswordValid ? "valid-input" : "invalid-input"}
 									/>
 								</OverlayTrigger>
 							</Form.Group>
