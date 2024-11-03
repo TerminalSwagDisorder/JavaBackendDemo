@@ -31,7 +31,6 @@ public class User {
 	private String email;
 
 	@NotBlank(message = "Password is required")
-	@NotNull
 	@ValidPassword
 	@Column(name = "Password")
 	@JsonProperty("Password")

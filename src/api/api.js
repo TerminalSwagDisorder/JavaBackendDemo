@@ -338,7 +338,7 @@ export const handleSignup = async (event, formFields) => {
 				"Content-Type": "application/json"
 			},
 			credentials: "include", // Important, because we're using cookies
-			body: JSON.stringify({ formFields: formFields }),
+			body: formFields,
 		});
 
 		const data = await response.json();
