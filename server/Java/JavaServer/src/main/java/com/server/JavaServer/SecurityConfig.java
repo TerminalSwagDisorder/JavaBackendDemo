@@ -22,10 +22,11 @@ public class SecurityConfig {
  @Bean
  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
      http
-         .csrf(csrf -> csrf.disable())
-         .authorizeHttpRequests(auth -> auth
-             .requestMatchers("/api/**").permitAll()
-             .anyRequest().authenticated()
+     	.cors(cors -> cors.configurationSource(corsConfigurationSource()))
+        .csrf(csrf -> csrf.disable())
+        .authorizeHttpRequests(auth -> auth
+    		.requestMatchers("/api/**").permitAll()
+    		.anyRequest().authenticated()
          )
          .sessionManagement(session -> session
              .maximumSessions(1)
@@ -35,14 +36,14 @@ public class SecurityConfig {
  }
  @Bean
  public CorsConfigurationSource corsConfigurationSource() {
-     CorsConfiguration configuration = new CorsConfiguration();
-     configuration.addAllowedOrigin("http://localhost:3000");
-     configuration.addAllowedMethod("*"); 
-     configuration.addAllowedHeader("*");
-     configuration.setAllowCredentials(true);
-
-     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-     source.registerCorsConfiguration("/**", configuration);
-     return source;
- }
+		CorsConfiguration configuration = new CorsConfiguration();
+		configuration.addAllowedOrigin("http://localhost:3000");
+		configuration.addAllowedMethod("*"); 
+		configuration.addAllowedHeader("*");
+		configuration.setAllowCredentials(true);
+		
+		 UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		source.registerCorsConfiguration("/**", configuration);
+		return source;
+	}
 }
