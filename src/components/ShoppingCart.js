@@ -14,7 +14,10 @@ const ShoppingCart = () => {
 	const cartItems = Object.values(shoppingCart);
 	const cartEntries = Object.entries(shoppingCart);
 
-
+    const totalPrice = cartItems.reduce((acc, item) => {
+        return acc + (parseFloat(item.Price) * parseInt(item.quantity) || 0);
+    }, 0).toFixed(2);
+	
 	const sortingId = (key) => parseInt(key.split('_')[1], 10);
 	const usedPartsItems = cartEntries
 		.filter(([partKey, partVal]) => partVal.table === "usedParts");
@@ -122,9 +125,18 @@ const ShoppingCart = () => {
 
 	return (
 		<div>
-			<Button className="user-select-button" onClick={() => handleClearCart()}>
-				Clear Cart
-			</Button>
+			<div id="shopping-cart-top">
+				{(totalPrice && totalPrice > 0) ? (
+					<p>
+						Total price: <b>{totalPrice}</b> €
+					</p>
+				) : (
+					<p>No price could be calculated!</p>
+				)}
+				<Button className="user-select-button" onClick={() => handleClearCart()}>
+					Clear Cart
+				</Button>
+			</div>
 			<br />
 			<br />
 			<br />

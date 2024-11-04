@@ -21,7 +21,7 @@ import {
 	Tooltip
 } from "react-bootstrap";
 
-const Profile = ({ currentUser, setCurrentUser, handleCredentialChange, handleSignout, refreshProfileData }) => {
+const Profile = ({ currentUser, setCurrentUser, handleCredentialChange, handleSignout, checkIfSignedIn }) => {
 	const navigate = useNavigate();
 	const [currentOperation, setCurrentOperation] = useState("");
 	const [formFields, setFormFields] = useState({});
@@ -101,15 +101,6 @@ const Profile = ({ currentUser, setCurrentUser, handleCredentialChange, handleSi
 									/>
 								</OverlayTrigger>
 							</Form.Group>
-							<Form.Group className="mb-3">
-								<Form.Control
-									type="password"
-									placeholder="Enter current password"
-									name="currentPassword"
-									onChange={handleInputChange}
-									required
-								/>
-							</Form.Group>
 							<Button variant="primary" type="submit">
 								Change credentials
 							</Button>
@@ -148,15 +139,6 @@ const Profile = ({ currentUser, setCurrentUser, handleCredentialChange, handleSi
 										className={passwordValid ? "valid-input" : "invalid-input"}
 									/>
 								</OverlayTrigger>
-							</Form.Group>
-							<Form.Group className="mb-3">
-								<Form.Control
-									type="password"
-									placeholder="Enter current password"
-									name="currentPassword"
-									onChange={handleInputChange}
-									required
-								/>
 							</Form.Group>
 							<Button variant="primary" type="submit">
 								Change credentials
@@ -222,8 +204,6 @@ const Profile = ({ currentUser, setCurrentUser, handleCredentialChange, handleSi
 		const newEmail = event.target.email.value;
 		const newPassword = event.target.password.value;
 
-		const currentPassword = event.target.currentPassword.value;
-
 		// Check if any field is filled
 		if (!newName && !newEmail && !newPassword) {
 			alert("No credentials entered!");
@@ -236,14 +216,10 @@ const Profile = ({ currentUser, setCurrentUser, handleCredentialChange, handleSi
 			return;
 		}
 
-		if (!currentPassword) {
-			alert("You must enter your current password!");
-		}
-
 		try {
 			const success = await handleCredentialChange(event, formFields);
 			if (success) {
-				await refreshProfileData();
+				setCurrentUser(success);
 				closeForm();
 				setFormFields({});
 				setEmailValid(false);

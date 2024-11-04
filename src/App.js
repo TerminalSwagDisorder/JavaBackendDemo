@@ -13,7 +13,7 @@ import PartsDisplay from "./components/PartsDisplay";
 import ComputerWizard from './components/ComputerWizard';
 import ComputerWizardBrowse from './components/ComputerWizardBrowse';
 import ShoppingCart from './components/ShoppingCart';
-import { ThemeContext, ThemeProvider, fetchUsers, fetchDynamicData, fetchSearchIdData, fetchDataAmount, handleSignin, handleSignup, handleSignout, checkIfSignedIn, refreshProfile, handleCredentialChange } from "./api/api";
+import { ThemeContext, ThemeProvider, fetchUsers, fetchDynamicData, fetchSearchIdData, fetchDataAmount, handleSignin, handleSignup, handleSignout, checkIfSignedIn, refreshProfile, handleCredentialChange, updateDynamicData, deleteDynamicData } from "./api/api";
 import { useSelector, useDispatch } from "react-redux";
 
 
@@ -34,13 +34,12 @@ function App() {
 	const fetchUserStatus = async () => {
 		try {
 			// Initialize currentUser with user data
-			const userData = await checkIfSignedIn();
-			if (userData) {
-				// Refresh profile
-				const refreshedUserData = await refreshProfile();
-				setCurrentUser(refreshedUserData);
+			if (await checkIfSignedIn()) {
+				const userData = await checkIfSignedIn();
+				console.log(userData);
+				setCurrentUser(userData);
 				console.log("userData", userData); // note that userData remains the same until re-login
-				console.log("refreshedUserData", refreshedUserData); // Thats why we have refreshedUserData
+				//console.log("refreshedUserData", refreshedUserData); // Thats why we have refreshedUserData
 			} else {
 				setCurrentUser(null);
 			}
@@ -71,7 +70,7 @@ function App() {
 		<Routes>
 	  		<Route path="/" element={<Home />} />
 		{/*{currentUser && currentUser.role === "admin" && (*/}
-		{currentUser && currentUser.isAdmin && (
+		{currentUser && currentUser.RoleID === 3 && (
                             <Route path="admin" element={<Admin currentUser={currentUser} />}>
                                 <Route path="dashboard" element={<DashboardAdmin currentUser={currentUser} />} />
                                 <Route path="users" element={<UsersAdmin currentUser={currentUser} fetchUsers={fetchUsers} />} />
@@ -80,7 +79,7 @@ function App() {
 		)}
 		{currentUser ? (
 			<>
-			<Route path="profile" element={<Profile currentUser={currentUser} setCurrentUser={handleUserChange} handleCredentialChange={handleCredentialChange} handleSignout={handleSignout} refreshProfileData={refreshProfileData} />} />
+			<Route path="profile" element={<Profile currentUser={currentUser} setCurrentUser={handleUserChange} handleCredentialChange={handleCredentialChange} handleSignout={handleSignout} checkIfSignedIn={checkIfSignedIn} />} />
 			</>
 		):(
 			<>
@@ -88,7 +87,7 @@ function App() {
 			<Route path="Signin" element={<Signin handleUserChange={handleUserChange} currentUser={currentUser} handleSignin={handleSignin} checkIfSignedIn={checkIfSignedIn}/>} />
 			</>
 		)}
-			<Route path="newparts" element={<ComputerWizardBrowse fetchDynamicData={fetchDynamicData} fetchDataAmount={fetchDataAmount} />} />
+			<Route path="newparts" element={<ComputerWizardBrowse fetchDynamicData={fetchDynamicData} fetchDataAmount={fetchDataAmount} currentUser={currentUser} updateDynamicData={updateDynamicData} deleteDynamicData={deleteDynamicData} />} />
 			
 			{shoppingCart && totalCartItems && totalCartItems > 0 && (
 				<Route path="shoppingcart" element={<ShoppingCart />} />

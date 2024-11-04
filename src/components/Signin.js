@@ -11,7 +11,6 @@ export const Signin = ({ handleUserChange, currentUser, handleSignin, checkIfSig
 	const [Email, setEmail] = useState("");
 	const [Password, setPassword] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
-	const [userType, setUserType] = useState("user");
 	const [formFields, setFormFields] = useState({});
 
 	const handleInputChange = (event) => {
@@ -21,50 +20,17 @@ export const Signin = ({ handleUserChange, currentUser, handleSignin, checkIfSig
 		}));
 	};
 
-	const toggleUserType = (userType) => {
-		setUserType(userType)
-	}
-
-	const renderUserTypeToggle = (event) => {
-		let userTypeButton;
-		if (userType === "user") {
-			userTypeButton = ( 
-				<>
-				<Button onClick = {() => toggleUserType("meduser")}> User mode: { userType } </Button> 
-				</>
-			)
-		} else if (userType === "meduser") {
-			userTypeButton = ( 
-				<>
-				<Button onClick = {() => toggleUserType("user")}> User mode: { userType } </Button> 
-				</>
-			)
-		} else {
-			userTypeButton = ( 
-				<>
-				<Button onClick = {() => toggleUserType("user")}> User mode: No userType </Button> 
-				</>
-			)
-		}
-		return (
-			<>
-			{userTypeButton}
-			</>
-		)
-	}
-
 	// Function for when the user submits the sign in form
 	const handleSubmit = async (event) => {
-		// Need this to prevent regular js from ruining the form submission
 		event.preventDefault();
 		setIsLoading(true);
 		try {
-			const success = await handleSignin(event, formFields, handleUserChange, userType);
+			const success = await handleSignin(event, formFields, handleUserChange);
 			if (success) {
-				navigate("/")
+				navigate("/");
 			}
 		} catch (error) {
-			console.error(error.message);
+			console.error(error);
 		} finally {
 			setIsLoading(false);
 		}
@@ -87,7 +53,6 @@ export const Signin = ({ handleUserChange, currentUser, handleSignin, checkIfSig
 					boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
 				}}
 			>
-			{renderUserTypeToggle()}
 				<Form style={{ textAlign: "left" }} onSubmit={handleSubmit}>
 					<h1>Sign in</h1>
 					<Form.Group className="mb-3" controlId="formBasicEmail" >

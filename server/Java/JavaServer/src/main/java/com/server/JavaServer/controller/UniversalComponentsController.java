@@ -78,7 +78,7 @@ public class UniversalComponentsController {
                 return id != null ? storageService.findByIdAsPage(id, pageRequest).getContent() : storageService.findAll(pageRequest).getContent();
             case "chassis":
                 return id != null ? chassisService.findByIdAsPage(id, pageRequest).getContent() : chassisService.findAll(pageRequest).getContent();
-            case "cooler":
+            case "cpu_cooler":
                 return id != null ? coolerService.findByIdAsPage(id, pageRequest).getContent() : coolerService.findAll(pageRequest).getContent();
             default:
                 throw new IllegalArgumentException("Invalid part name: " + partName);
@@ -110,7 +110,7 @@ public class UniversalComponentsController {
             case "chassis":
                 Chassis chassis = objectMapper.convertValue(partData, Chassis.class);
                 return chassisService.insert(chassis);
-            case "cpucooler":
+            case "cpu_cooler":
                 CpuCooler cpucooler = objectMapper.convertValue(partData, CpuCooler.class);
                 return coolerService.insert(cpucooler);
             default:
@@ -144,7 +144,7 @@ public class UniversalComponentsController {
             case "chassis":
                 Chassis chassis = objectMapper.convertValue(partData, Chassis.class);
                 return chassisService.update(id, chassis);
-            case "cpucooler":
+            case "cpu_cooler":
                 CpuCooler cpucooler = objectMapper.convertValue(partData, CpuCooler.class);
                 return coolerService.update(id, cpucooler);
             default:
@@ -178,7 +178,7 @@ public class UniversalComponentsController {
             case "chassis":
                 chassisService.delete(id);
                 break;
-            case "cooler":
+            case "cpu_cooler":
                 coolerService.delete(id);
                 break;
             default:

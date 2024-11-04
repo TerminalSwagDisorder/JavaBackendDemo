@@ -39,7 +39,7 @@ const NavBar = ({ currentUser, handleUserChange, handleSignout, ThemeContext }) 
 			await handleSignout();
 			handleUserChange(null);
 		} catch (error) {
-			console.log(error.message);
+			console.log(error);
 		}
 	};
 
@@ -64,7 +64,7 @@ const NavBar = ({ currentUser, handleUserChange, handleSignout, ThemeContext }) 
 	const userNavbar = () => {
 		let adminCheck;
 		let userCheck;
-		if (currentUser && currentUser.role !== "user") {
+		if (currentUser && currentUser.RoleID === 3) {
 			adminCheck = (
 				<>
 					<Nav.Link as={Link} to="/admin/dashboard" className={activeLink === "/admin/dashboard" ? "active-navbar-link" : "navbar-link"} onClick={() => onUpdateActiveLink("/admin/dashboard")}>

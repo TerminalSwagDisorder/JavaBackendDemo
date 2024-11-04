@@ -119,7 +119,7 @@ export const insertDynamicData = async (formFields, tableName, partName) => {
 				"Content-Type": "application/json"
 			},
 			credentials: "include", // Important, because we're using cookies
-			body: JSON.stringify({ formFields: formFields }),
+			body: formFields,
 		});
 
 		const data = await response.json();
@@ -139,6 +139,8 @@ export const insertDynamicData = async (formFields, tableName, partName) => {
 
 export const updateDynamicData = async (formFields, tableName, partName, id) => {
 	try {
+		console.log(`http://localhost:4000/api/${tableName}/update/${partName}/${id}`);
+		console.log(formFields);
 		await checkAllowedTableNames(tableName);
 		
 		if (partName) {
@@ -149,13 +151,13 @@ export const updateDynamicData = async (formFields, tableName, partName, id) => 
 
 		if (formFields && typeof formFields === "object" && !Array.isArray(formFields)) formFields = JSON.stringify(formFields);
 		// api call to register a new user
-		const response = await fetch(`http://localhost:4000/api/${tableName}/update/${partName}/${partName}`, {
+		const response = await fetch(`http://localhost:4000/api/${tableName}/update/${partName}/${id}`, {
 			method: "PATCH",
 			headers: {
 				"Content-Type": "application/json"
 			},
 			credentials: "include", // Important, because we're using cookies
-			body: JSON.stringify({ formFields: formFields }),
+			body: formFields,
 		});
 
 		const data = await response.json();
@@ -164,8 +166,45 @@ export const updateDynamicData = async (formFields, tableName, partName, id) => 
             alert(`HTTP error ${response.status}: ${data.message}`);
             throw new Error(`HTTP error ${response.status}: ${data.message}`);
         }
+		
+		alert(`Successfully updated ${partName} with id ${id} from ${tableName}`);
 
 		return data;
+	} catch (error) {
+		console.error("Error adding user:", error);
+		if (error.message) alert(error.message);
+
+	}
+};
+
+export const deleteDynamicData = async (tableName, partName, id) => {
+	try {
+		console.log(`http://localhost:4000/api/${tableName}/update/${partName}/${id}`);
+		await checkAllowedTableNames(tableName);
+		
+		if (partName) {
+			await checkAllowedPartNames(partName);
+		} else {
+			console.log("partName has no value. This might be intentional, but double check to be sure.");
+		}
+
+		// api call to register a new user
+		const response = await fetch(`http://localhost:4000/api/${tableName}/delete/${partName}/${id}`, {
+			method: "DELETE",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			credentials: "include", // Important, because we're using cookies
+		});
+
+		const data = await response;
+
+        if (!response.ok) {
+            alert(`HTTP error ${response.status}: ${data.message}`);
+            throw new Error(`HTTP error ${response.status}: ${data.message}`);
+        }
+		alert(`Successfully deleted ${partName} with id ${id} from ${tableName}`);
+		return true;
 	} catch (error) {
 		console.error("Error adding user:", error);
 		if (error.message) alert(error.message);
@@ -286,8 +325,8 @@ export const fetchServerRoutes = async () => {
 // Do all of the user data handling async
 // Signin
 export const handleSignin = async (event, formFields, handleUserChange) => {
-	const email = event.target.email.value;
-	const password = event.target.password.value;
+	const email = event.target.Email.value;
+	const password = event.target.Password.value;
 
 	// api call to the server to log in the user
 	try {
@@ -300,26 +339,20 @@ export const handleSignin = async (event, formFields, handleUserChange) => {
 					"Content-Type": "application/json"
 				},
 				credentials: "include", // For all fetch requests, do this!
-				body: JSON.stringify({ formFields: formFields }),
+				body: formFields,
 			});
 			const data = await response.json();
-			//console.log("data.userData", data.user)
+			console.log(data);
 
-			// If successful, set the current user to the provided credentials and return the data
-			if (response.ok) {
-				alert("Successfully signed in!");
-				handleUserChange(data.user);
-				return data.user;
-			} else {
-				console.log(data);
-				if (data.message) {
-					alert(`HTTP error ${response.status}: ${data.message}`);
-					throw new Error(data.error);
-				} else {
-					alert("Failed sign in. Please try again.");
-					throw new Error(data.error);
-					}
-				}
+			if (!response.ok) {
+				alert(`HTTP error ${response.status}: ${response.message}`);
+				throw new Error(`HTTP error ${response.status}: ${response.message}`);
+			}
+
+			alert("Successfully signed in!");
+			handleUserChange(data);
+			return data;
+
 			}
 	} catch (error) {
 		console.error("Error signing user in:", error);
@@ -363,23 +396,23 @@ export const handleSignup = async (event, formFields) => {
 export const handleSignout = async (handleUserChange) => {
 	
 	// api call to log out the user
-	const response = await fetch("http://localhost:4000/api/logout", {
+	const response = await fetch("http://localhost:4000/api/users/logout", {
 		method: "POST",
 		credentials: "include",  // Important, because we're using cookies
 	});
 
-	const data = await response.json();
+	const data = await response;
 	
-	// If successful, reload the current window
-	if (response.ok) {
-		localStorage.removeItem("accessToken");
-		sessionStorage.removeItem("accessToken");
-		
-		window.location.reload();
-		return "Logged out successfully";
-	} else {
-		console.error(data.error);
+	if (!response.ok) {
+		alert(`HTTP error ${response.status}: ${data.message}`);
+		throw new Error(`HTTP error ${response.status}: ${data.message}`);
 	}
+
+	localStorage.removeItem("accessToken");
+	sessionStorage.removeItem("accessToken");
+
+	window.location.reload();
+	return "Logged out successfully";
 };
 
 
@@ -388,7 +421,7 @@ export const checkIfSignedIn = async () => {
 
 	// api call to get the user's profile information
 	try {
-		const response = await fetch("http://localhost:4000/api/profile", {
+		const response = await fetch("http://localhost:4000/api/users/profile", {
 			method: "GET",
 			credentials: "include", // Important, because we're using cookies
 		});
@@ -415,7 +448,7 @@ export const refreshProfile = async () => {
 
 	// api call to get the user's profile information
 	try {
-		const response = await fetch("http://localhost:4000/api/profile/refresh", {
+		const response = await fetch("http://localhost:4000/api/users/profile/refresh", {
 			method: "GET",
 			credentials: "include", // Important, because we're using cookies
 		});
@@ -425,7 +458,7 @@ export const refreshProfile = async () => {
 		// If the user is authenticated, return user data
 		if (response.ok) {
 			//handleUserChange(data.userData)
-			return data.userData;
+			return data;
 		} else {
 			// If authentication fails
 			// User is not signed in (invalid token or other error)
@@ -443,31 +476,28 @@ export const handleCredentialChange = async (event, formFields) => {
     try {
 		if (formFields && typeof formFields === "object" && !Array.isArray(formFields)) formFields = JSON.stringify(formFields);
 
-		const response = await fetch("http://localhost:4000/api/profile", {
+		const response = await fetch("http://localhost:4000/api/users/profile/update", {
 				method: "PATCH",
 				headers: {
 					"Content-Type": "application/json"
 				},
 				credentials: "include", // Important, because we're using cookies
-				body: JSON.stringify({ formFields: formFields }),
+				body: formFields,
 			});
 
 		const data = await response.json();
 
-		// Handle update
-		if (response.ok) {
-			console.log("User updated successfully:", data);
-			alert("Successfully changed credentials!");
-			return true;
-		} else {
-			if (data.message) {
-				alert(`HTTP error ${response.status}: ${data.message}`);
-				throw new Error(data.error);
-			} else {
-				alert("Failed change credentials. Please try again.");
-				throw new Error(data.error);
-			}
+		if (!response.ok) {
+			alert(`HTTP error ${response.status}: ${data.message}`);
+			throw new Error(`HTTP error ${response.status}: ${data.message}`);
 		}
+		
+		const userData = await checkIfSignedIn();
+
+		console.log("User updated successfully:", data);
+		alert("Successfully changed credentials!");
+		return userData;
+
     } catch (error) {
         console.error("Error updating credentials:", error);
     }
